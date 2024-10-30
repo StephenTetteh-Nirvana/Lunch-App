@@ -1,0 +1,59 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply font-sans;
+  }
+}
+
+@layer utilities {
+  
+}
+
+  /* @keyframes showCart {
+    0% { left: 100% }
+    100% { left: 50% }
+  }
+
+  @keyframes hideCart {
+    0% { left: 50% }
+    100% { left: 100% }
+  }
+
+  /* Mobile Animations */
+  /* @media screen and (max-width:767px) {
+    @keyframes showCart {
+      0% { left: 100% }
+      100% { left: 0% }
+    }
+
+    @keyframes hideCart {
+      0% { left: 0% }
+      100% { left: 100% }
+    }
+  } */ 
+
+
+  /* @media screen and (max-width:1024px) and (min-width:767px) {
+    @keyframes showCart {
+      0% { left: 100% }
+      100% { left: 40% }
+    }
+
+    @keyframes hideCart {
+      0% { left: 40% }
+      100% { left: 100% }
+    }
+  } */
+
+  /* .animate-showCart {
+    animation: showCart 0.7s forwards
+  }
+
+  .animate-hideCart {
+    animation: hideCart 0.7s forwards
+  } */

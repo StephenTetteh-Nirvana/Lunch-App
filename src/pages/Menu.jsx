@@ -7,8 +7,8 @@ const slides = [
     
   { image: Waakye, description:'African Dish Waakye'},
   { image: Waakye, description:'Waakye' },
-  { image: Waakye, description:'Waakye'},
-  { image: Waakye, description:'Waakye' }
+  { image: Waakye, description:'Waakye'}
+  
   
   ]
 
@@ -25,10 +25,10 @@ const Menu = () => {
         <button className="flex flex-row text-center font-extrabold 
         bg-red-500 rounded-full py-3 px-5 text-white m-auto"
         >
-          Monday
+          Monday Specials.
           <span className="ml-2"><ChevronDown size={25} /></span>
         </button>
-        <div className="grid grid-cols-4 mt-5 gap-4 mobile:grid-cols-1 tablet:grid-cols-2 p-4">
+        <div className="grid grid-cols-3 mt-4 gap-3 mobile:grid-cols-1 tablet:grid-cols-2 p-4">
           {slides.map((item,index)=>(
             <div key={index} className="max-w-[300px] rounded-lg m-auto flex flex-col">
               <div>

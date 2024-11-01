@@ -82,7 +82,7 @@ const Menu = () => {
               </div>
               <div className="flex flex-col justify-between bg-[#F5F5F5] py-4 px-2 rounded-lg">
                 <h3 className="font-bold">{item.description}</h3>
-                <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ab, mollitia.</p>
+                <p className="line-clamp-2">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ab, mollitia.</p>
                 <button className="bg-[#2666CF] text-white text-center p-2 rounded-md mt-2">Select</button>
               </div>
             </div>

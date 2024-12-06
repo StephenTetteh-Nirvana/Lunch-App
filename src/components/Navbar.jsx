@@ -1,82 +1,72 @@
-import { Gitlab, User, AlignJustify, X } from "lucide-react"
-import { useState } from "react"
-import { Link } from "react-router-dom"
+import { LogOut, UserCircle2 } from "lucide-react"
+import { Link, useNavigate } from "react-router-dom"
+import { useContext, useState } from "react"
+import { signOut } from "firebase/auth"
+import { auth } from "../firebase"
+import Swal from "sweetalert2"
+import Logo from "../assets/images/freeZones.jpg"
+import Account from "./Account"
+import GlobalState from "../context/GlobalState"
 
 const Navbar = () => {
-  const [hamburgerOpen,setHamburgerOpen] = useState(false)
+
+  const {setAuthenticated} = useContext(GlobalState)
+  const user = localStorage.getItem('user') !== null ? JSON.parse(localStorage.getItem('user')) : null
+  const userData = localStorage.getItem('userData') !== null ? JSON.parse(localStorage.getItem('userData')) : null
+
+  const navigate = useNavigate()
+  const [openModal,setOpenModal] = useState(false)
+
+  const logOut = async() =>{
+    await signOut(auth)
+    .then(()=>{
+      navigate("/login")
+      setAuthenticated(false)
+      localStorage.clear()
+    }).catch((error)=>{
+      console.log(error)
+      Swal.fire({
+        title: "Network Erro",
+        text: "Please check your internet connection",
+        icon: "error"
+      })
+    })
+  }
 
   return (
   <>
-    <div className="bg-black p-3 h-20 w-full flex flex-row justify-between overflow-hidden">
-      <div className="my-auto ml-6">
-       <Gitlab color="white" size={30}/>
-      </div>
-
-      <ul className="flex flex-row my-auto gap-4 mobile:hidden">
-        <Link to="/">
-          <li className="relative group p-1 text-white hover:cursor-pointer">
-            Home
-            <span 
-              className="absolute -bottom-1 left-0 w-full h-[2px] bg-white transition-transform duration-300 ease-in-out 
-              scale-x-0 group-hover:scale-x-100"
-              ></span>
-          </li>
-        </Link>
-        <Link to="/about">
-          <li className="relative group p-1 text-white hover:cursor-pointer">
-            About
-            <span 
-              className="absolute -bottom-1 left-0 w-full h-[2px] bg-white transition-transform duration-300 ease-in-out 
-              scale-x-0 group-hover:scale-x-100"
-              ></span>
-          </li>
-        </Link>
-        <Link to="/services">
-          <li className="relative group p-1 text-white hover:cursor-pointer">
-            Services
-            <span 
-              className="absolute -bottom-1 left-0 w-full h-[2px] bg-white transition-transform duration-300 ease-in-out 
-              scale-x-0 group-hover:scale-x-100"
-              ></span>
-          </li>
-        </Link>
-      </ul>
-
-      <div className="group my-auto mr-5 hover:cursor-pointer overflow-hidden">
-        <div className="rounded-full p-3 my-auto flex items-center justify-center
-         bg-white mr-5 hover:cursor-pointer mobile:hidden">
-          <User />  
+    <div className="mt-5 flex flex-row justify-between w-full px-5">
+      <Link to='/'>
+        <img className="w-[200px]" src={Logo} alt="Logo here" />
+      </Link>
+      {user ? (
+        <div className="group hover:cursor-pointer relative">
+          <div className="bg-[#2666CF] rounded-full text-white w-[50px] h-[50px] flex justify-center items-center">
+            <h3 className="font-semibold text-xl">{userData.firstName[0]}</h3>
+          </div>
+          <div className="invisible shadow-black shadow-md p-2 rounded-md absolute right-10 top-10 group-hover:visible"
+          >
+            <li className="flex flex-row list-none p-2 hover:bg-slate-100" onClick={()=>setOpenModal(true)}>
+              <UserCircle2/>
+              <span className="ml-2">Account</span>
+            </li>
+            <li className="flex flex-row list-none p-2 hover:bg-slate-100" onClick={()=>logOut()}>
+              <LogOut/>
+              <span className="ml-2">LogOut</span>
+            </li>
+          </div>
         </div>
-        <div className="hidden mobile:block">
-          {hamburgerOpen ? (
-            <button onClick={()=>setHamburgerOpen(false)}>
-              <X color="white" size={30} />
-            </button>
-            ) 
-            :
-            ( 
-            <button onClick={()=>setHamburgerOpen(true)}>
-              <AlignJustify color="white" size={30}/>
-            </button>
-          )}
-        </div>
-      </div>
-    </div>
-
-    <div className={`transition-all duration-300 w-full bg-black 
-      ${ hamburgerOpen ? 'h-[200px] visible' : 'h-0 invisible'} z-50`}
-    >
-      <ul className="py-5 flex flex-col justify-center items-center gap-2">
-        <li className="py-2 text-white text-xl">
-           Home
-        </li>
-        <li className="py-2 text-white text-xl">
-           About
-        </li>
-        <li className="py-2 text-white text-xl">
-           Services
-        </li>
-      </ul>
+      )
+      :
+      (
+        <button className="bg-black text-white py-2 rounded-md text-md px-3 font-semibold"
+         onClick={()=>navigate('/login')}
+        >
+          Get Started
+        </button>
+      )
+      }
+      {openModal && <Account openModal={openModal} setOpenModal={setOpenModal}/>}
     </div>
   </>
 

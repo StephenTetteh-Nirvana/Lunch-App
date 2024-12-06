@@ -1,10 +1,8 @@
-import { Link } from "react-router-dom"
-import { ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react"
 import { useState } from "react"
-import { AnimatePresence, motion } from "framer-motion";
-import Logo from "../assets/images/freeZones.jpg"
-import Waakye from "../assets/images/waakye.jpg";
-import Loader from "../components/Loader";
+import { AnimatePresence, motion } from "framer-motion"
+import Waakye from "../assets/images/waakye.jpg"
+import Loader from "../components/Loader"
 
 const slides = [
     
@@ -27,12 +25,7 @@ const Menu = () => {
   }
 
   return (
-    <div>
-      <Link to='/'>
-        <div className="mt-5">
-          <img className="w-[200px]" src={Logo} alt="Logo here" />
-        </div>
-      </Link>
+    <div className="px-5">
 
       <section className="mt-10">
         <div className="flex flex-col justify-center items-center ">

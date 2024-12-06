@@ -1,18 +1,17 @@
 import { MoveRight } from "lucide-react"
 import { motion } from "framer-motion"
-import { Link, useNavigate } from "react-router-dom"
-import Logo from "../assets/images/freeZones.jpg"
+import { useNavigate } from "react-router-dom"
 import Carousel from "../components/Carousel"
+import { useContext } from "react";
+import GlobalState from "../context/GlobalState";
 
 const Home = () => {
   const navigate = useNavigate()
+  const {isAuthenticated} = useContext(GlobalState)
+
+  
   return (
-    <div className="bg-white w-full">
-      <Link to='/'>
-        <div className="mt-5">
-          <img className="w-[200px]" src={Logo} alt="Logo here" />
-        </div>
-      </Link>
+    <div className="bg-white w-full px-5">
       <div className="mt-10 tablet:mt-32">
         <div className="w-full grid grid-rows-2">
           <div className="flex flex-col justify-center items-center">
@@ -54,7 +53,7 @@ const Home = () => {
               whileTap={{rotate: 360}}
               className="bg-red-500 px-6 py-3 group rounded-full mt-5 flex flex-row 
              text-white mobile:py-3"
-              onClick={()=>navigate('/menu')}
+              onClick={()=>isAuthenticated ? navigate('/menu') : navigate('/login')}
             >
               Place your weekly order
               <span className="ml-2 group-hover:ml-5 transition-margin duration-300 ease-in-out">

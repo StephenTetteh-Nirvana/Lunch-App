@@ -12,9 +12,6 @@ export default {
      desktopLg: { min: '1024px'}
     },
     extend: {
-      colors:{
-        cartWrapper: 'rgba(0,0,0,0.8)'
-      },
       fontFamily: {
         sans: ['Poppins','sans-serif'],
       },

@@ -12,7 +12,7 @@ const Navbar = () => {
 
   const {setAuthenticated} = useContext(GlobalState)
   const user = localStorage.getItem('user') !== null ? JSON.parse(localStorage.getItem('user')) : null
-  const userData = localStorage.getItem('userData') !== null ? JSON.parse(localStorage.getItem('userData')) : null
+  const userData = localStorage.getItem('userData') !== null ? JSON.parse(localStorage.getItem('userData')) : []
 
   const navigate = useNavigate()
   const [openModal,setOpenModal] = useState(false)
@@ -26,7 +26,7 @@ const Navbar = () => {
     }).catch((error)=>{
       console.log(error)
       Swal.fire({
-        title: "Network Erro",
+        title: "Network Error",
         text: "Please check your internet connection",
         icon: "error"
       })

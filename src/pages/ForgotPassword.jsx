@@ -51,7 +51,7 @@ const ForgotPassword = () => {
         </div>
         <div className="mt-5">
           { !loading ? 
-            <button className="border-2 border-green-700 bg-green-700 text-white py-2 w-full rounded-md 
+            <button className="border-2 border-green-700 bg-green-700 text-white py-2 w-full rounded-md
               hover:bg-transparent hover:text-green-700 font-semibold"
               onClick={()=>passwordReset()}
               >

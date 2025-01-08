@@ -25,6 +25,7 @@ const Account = ({ openModal, setOpenModal }) => {
   },[])
 
 
+
   return (
     <AnimatePresence>
       {openModal && !isClosing && (

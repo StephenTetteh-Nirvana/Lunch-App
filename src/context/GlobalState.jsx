@@ -51,26 +51,26 @@ export const StateProvider = ({children}) => {
       switch(error.code){
         case 'auth/invalid-email':
           setErrMsg('Invalid Email')
-          break;
+        break;
 
         case 'auth/invalid-credential':
           setErrMsg('Wrong Email/Password')
-          break;
+        break;
 
         case 'auth/email-already-in-use': 
           setErrMsg('Email is already taken.')
-          break;
+        break;
 
         case 'auth/wrong-password': 
           setErrMsg('Wrong Password')
-          break;
+        break;
 
         case 'auth/email-already-exists':
           setErrMsg('Email Already Exists')
-          break;
+        break;
 
         default: 
-        setErrMsg('Please check your internet connection.')
+          setErrMsg('Please check your internet connection.')
         break
       }
     }finally{
@@ -91,7 +91,6 @@ export const StateProvider = ({children}) => {
         const userDocRef = doc(db,"Users",user.uid)
         const userDoc = await getDoc(userDocRef) 
         if(userDoc.exists){
-          console.log(userDoc.data())
           localStorage.setItem('userData',JSON.stringify(userDoc.data()))
         }
       }
@@ -106,30 +105,30 @@ export const StateProvider = ({children}) => {
       switch(error.code){
         case 'auth/invalid-email':
           setErrMsg('Invalid Email')
-          break;
+        break;
 
         case 'auth/invalid-credential':
           setErrMsg('Wrong Email/Password')
-          break;
+        break;
 
         case 'auth/email-already-in-use': 
           setErrMsg('Email Already Exists')
-          break;
+        break;
 
         case 'auth/wrong-password': 
           setErrMsg('Wrong Password')
-          break;
+        break;
 
         case 'auth/user-not-found':
           setErrMsg('Account does not exist.')
-          break;
+        break;
 
         case 'auth/weak-password':
           setErrMsg('Password should be 6 characters or more.')
-          break;
+        break;
 
         default: 
-        setErrMsg('Please check your internet connection.')
+          setErrMsg('Please check your internet connection.')
         break;
       }
     }finally{

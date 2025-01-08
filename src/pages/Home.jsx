@@ -2,12 +2,12 @@ import { MoveRight } from "lucide-react"
 import { motion } from "framer-motion"
 import { useNavigate } from "react-router-dom"
 import Carousel from "../components/Carousel"
-import { useContext } from "react";
-import GlobalState from "../context/GlobalState";
 
 const Home = () => {
   const navigate = useNavigate()
-  const {isAuthenticated} = useContext(GlobalState)
+  const user = localStorage.getItem('user') !== null ? JSON.parse(localStorage.getItem('user')) : []
+
+  console.log(user)
 
   
   return (
@@ -53,7 +53,7 @@ const Home = () => {
               whileTap={{rotate: 360}}
               className="bg-red-500 px-6 py-3 group rounded-full mt-5 flex flex-row 
              text-white mobile:py-3"
-              onClick={()=>isAuthenticated ? navigate('/menu') : navigate('/login')}
+              onClick={()=>user ? navigate('/menu') : navigate('/login')}
             >
               Place your weekly order
               <span className="ml-2 group-hover:ml-5 transition-margin duration-300 ease-in-out">

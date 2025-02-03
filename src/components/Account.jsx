@@ -1,15 +1,24 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { Camera, X } from 'lucide-react'
+import { doc, updateDoc } from 'firebase/firestore'
+import { db,auth } from '../firebase'
+import Swal from 'sweetalert2'
 import Profile from "../assets/images/profile.jpg"
+import GlobalState from '../context/GlobalState'
 
 const Account = ({ openModal, setOpenModal }) => {
 
-  const userData = localStorage.getItem('userData') !== null ? JSON.parse(localStorage.getItem('userData')) : null
+  const userData = localStorage.getItem('userData') !== null ? JSON.parse(localStorage.getItem('userData')) : []
+
+  const {fetchUser} = useContext(GlobalState)
 
   const [isClosing,setIsClosing] = useState(false)
   const [firstName,setFirstName] = useState('')
   const [lastName,setLastName] = useState('')
+  const [disabled,setDisabled] = useState(true)
+  const [editing,setEditing] = useState(false)
+  const [loading,setLoading] = useState(false)
 
   const closeForm = () => {
     setIsClosing(true)
@@ -20,10 +29,45 @@ const Account = ({ openModal, setOpenModal }) => {
   }
 
   useEffect(()=>{
+    fetchUser()
     setFirstName(userData.firstName)
     setLastName(userData.lastName)
   },[])
 
+
+  const allowEditing = () => {
+    setEditing(true)
+    setDisabled(false)
+  }
+
+  const editUserInfo = async() => {
+    setLoading(true)
+    try{
+      if(firstName === "" || lastName === ''){
+        alert('Please complete the form')
+      }else{
+      setLoading(true)
+      const user = auth.currentUser
+      const docRef = doc(db,"Users",user.uid) 
+      await updateDoc(docRef,{
+        firstName:firstName,
+        lastName:lastName
+      })
+      Swal.fire({
+        title: "Your profile has been updated.",
+        icon: "success",
+      });
+      setEditing(false)
+      setDisabled(true)
+    }
+    }catch(error){
+      console.log(error)
+      toast.error("Network Error")
+      setLoading(false)
+    }finally{
+      setLoading(false)
+    }
+  }
 
 
   return (
@@ -59,14 +103,15 @@ const Account = ({ openModal, setOpenModal }) => {
                 </div>
               </section>
     
-              <section className='w-[98%]'>
+              <div className='w-[98%]'>
                 <div>
                   <label>First Name</label>
                   <input type='text' 
                     className='w-full py-2 pl-2 border border-slate-500 rounded-md' 
                     autoComplete='off' 
-                    readOnly
                     value={firstName}
+                    disabled={disabled}
+                    style={disabled ? {cursor:"not-allowed"}:{}}
                     onChange={(e)=>setFirstName(e.target.value)}
                   />
                 </div>
@@ -76,8 +121,9 @@ const Account = ({ openModal, setOpenModal }) => {
                   <input type='text' 
                     className='w-full py-2 pl-2 border border-slate-500 rounded-md' 
                     autoComplete='off'
-                    readOnly
                     value={lastName}
+                    disabled={disabled}
+                    style={disabled ? {cursor:"not-allowed"}:{}}
                     onChange={(e)=>setLastName(e.target.value)}
                   />
                 </div>
@@ -99,16 +145,33 @@ const Account = ({ openModal, setOpenModal }) => {
                     value={userData.createdAt}
                   />
                 </div>
+                { editing ? (
 
-                <button className='bg-black w-full rounded-[5px] text-white py-2 mt-5 text-md'>
-                  Edit
-                </button>
+                  loading ? 
+                  <button className="bg-black w-full rounded-[5px] text-white py-2 mt-5 text-md 
+                    flex flex-row justify-center items-center gap-3"
+                  >
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Please Wait..
+                  </button>
+                  :
+                  <button className='bg-black w-full rounded-[5px] text-white py-2 mt-5 text-md'
+                   style={disabled ? {cursor:"not-allowed",opacity:"0.7"}:{}} 
+                   disabled={disabled}  onClick={editUserInfo}>Save</button>
+                  ) 
+                  : 
+                  <button className='bg-black w-full rounded-[5px] text-white py-2 mt-5 text-md' 
+                    onClick={allowEditing}
+                  >
+                    Edit
+                  </button>
+                }
                 <button className='mt-2 bg-red-800 w-full rounded-[5px] text-white py-2 text-md hover:bg-transparent 
-                  hover:border hover:border-red-500 hover:text-red-800 hover:font-semibold'
+                  hover:border hover:border-red-500 hover:text-red-800 hover:font-semibold cursor-not-allowed'
                 >
                   Delete Account
                 </button>
-              </section>
+              </div>
             </motion.form>
         </motion.div>
       )}

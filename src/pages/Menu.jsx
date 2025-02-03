@@ -158,7 +158,7 @@ const Menu = () => {
                 <div className="flex flex-col justify-between bg-[#F5F5F5] py-4 px-2 rounded-lg">
                   <div className="flex flex-row justify-between">
                     <h3 className="font-bold">{item.product}</h3>
-                    <p className="font-semibold">{item.price}.00</p>
+                    <p className="font-semibold">₵{item.price}.00</p>
                   </div>
                   <button 
                     className="bg-[#2666CF] text-white text-center p-2 rounded-md mt-2"

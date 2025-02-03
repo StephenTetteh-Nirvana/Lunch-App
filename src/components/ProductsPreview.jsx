@@ -144,13 +144,13 @@ const ProductsPreview = ({ openPreview, setOpenPreview, selectedProducts }) => {
                 <div key={product.price} className='grid grid-cols-3 w-full gap-5 p-3'>
                   <h3 className='font-semibold'>{day}</h3>
                   <p>{product?.product}</p>
-                  <p>{product?.price}</p>
+                  <p>₵{product?.price}</p>
                 </div>
               </>
             ))}
 
             <h3 className='flex justify-end text-lg font-semibold'>
-              Total: {Object.values(matchedProducts).reduce((total, product) => total + product.price, 0)}
+              Total: ₵{Object.values(matchedProducts).reduce((total, product) => total + product.price, 0)}
             </h3>
 
             <div className="mt-2 flex justify-center">

@@ -1,5 +1,5 @@
 import { createContext, useState } from "react"
-import { doc , setDoc , getDoc } from "firebase/firestore"
+import { doc , setDoc , getDoc, updateDoc, onSnapshot } from "firebase/firestore"
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth"
 import { db,auth } from "../firebase"
 import { useNavigate } from "react-router-dom"
@@ -12,6 +12,7 @@ export const StateProvider = ({children}) => {
   const [errMsg,setErrMsg] = useState('')
   const navigate = useNavigate()
 
+  //Register user
   const registerUser = async (email,password,firstName,lastName,department,setLoading) => {
     try{
       if ( firstName && lastName && email && password ) {
@@ -29,8 +30,29 @@ export const StateProvider = ({children}) => {
             email:email,
             department:department,
             status:'Personnel',
-            createdAt:`${date} at ${time}`
+            createdAt:`${date} at ${time}`,
+            submitted:false,
           })
+          
+          // Add users to the personnel section based on their department 
+          const departmentDoc = doc(db,"Departments",department)
+          const docRef = await getDoc(departmentDoc)
+          if(docRef.exists()){
+            const personnelArray = docRef.data().personnels || []
+            const personnelData = {
+              Img:'',
+              firstName:firstName,
+              lastName:lastName,
+              email:email,
+              status:'Personnel',
+              createdAt:`${date} at ${time}`,
+              orders:[]
+            }
+
+            await updateDoc(departmentDoc,{
+              personnels : [...personnelArray,personnelData]
+            })
+          }
         }
         Swal.fire({
           title: "Account created successfully",
@@ -78,6 +100,7 @@ export const StateProvider = ({children}) => {
     }
   }
 
+  //Login user
   const LoginUser = async(email,password,setLoading) =>{
     if(email === "" || password === "" ){
       alert('Fill all fields')
@@ -136,10 +159,25 @@ export const StateProvider = ({children}) => {
     }
   }
 
+  //Fetch and update user data in localStorage
+  const fetchUser = async() => {
+    const user = auth.currentUser
+    if(user){
+      const userDocRef = doc(db, "Users", user.uid);
+      const unsub = onSnapshot(userDocRef,(userData)=>{
+        if(userData.exists()){
+          localStorage.setItem('userData',JSON.stringify(userData.data()))
+          console.log('data fetched')
+        }
+      })
+      return unsub
+    }
+  }
+
   return (
     <GlobalState.Provider value={{
       registerUser,errMsg,LoginUser,
-      isAuthenticated,setAuthenticated
+      isAuthenticated,setAuthenticated,fetchUser
     }}>
       {children}
     </GlobalState.Provider>

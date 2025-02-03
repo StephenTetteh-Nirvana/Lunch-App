@@ -1,15 +1,21 @@
-import { ChevronDown,CircleCheck,Eye,MessageCircleWarning } from "lucide-react"
-import { useEffect, useState } from "react"
+import { ChevronDown, CircleCheck, Eye, LucideBadgeCheck, MessageCircleWarning } from "lucide-react"
+import { useContext, useEffect, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { onSnapshot, doc } from "firebase/firestore"
-import { db } from "../firebase"
+import { onAuthStateChanged } from "firebase/auth"
+import { db,auth } from "../firebase"
 import ProductsPreview from "../components/ProductsPreview"
 import Waakye from "../assets/images/waakye.jpg"
 import Loader from "../components/Loader"
+import GlobalState from "../context/GlobalState"
 
 const days = ['Monday','Tuesday','Wednesday','Thursday','Friday']
 
 const Menu = () => {
+
+  const {fetchUser} = useContext(GlobalState)
+  const userData = localStorage.getItem('userData') !== null ? JSON.parse(localStorage.getItem('userData')) : []  
+
   const [day,setDay] = useState('Monday')
   const [dropdown,setDropdown] = useState(false)
   const [loading,setLoading] = useState(false)
@@ -24,31 +30,11 @@ const Menu = () => {
     Friday:null
   })
 
-  //Check if each day has a product selected. 
-  useEffect(() => {
-    const allSelected = Object.entries(selectedProducts).every(
-      ([day,productID]) => productID !== null
-    )
-    setPreview(allSelected)
-  }, [selectedProducts]);
-  
-
   const updateDay = (day) => {
     setDay(day)
     setDropdown(false)
   }
-
-
-  const selectFood = (productID) => {
-    const foundProduct = foods.find((p)=>p.id === productID)
-    if(foundProduct){
-      setSelectedProducts((prevState)=>({
-        ...prevState,
-        [day]:productID
-      }))
-    }
-  }
-
+  
   const fetchFoods = () => {
     try{
       setLoading(true)
@@ -64,12 +50,54 @@ const Menu = () => {
       setLoading(false)
     }
   }
+  
+  // Select food for each day
+  const selectFood = (productID) => {
+    const foundProduct = foods.find((p)=>p.id === productID)
+    if(foundProduct){
+      setSelectedProducts((prevState)=>({
+        ...prevState,
+        [day]:productID
+      }))
+    }
+  }
+  
+  //Check if each day has a product selected. 
+  useEffect(() => {
+    const allSelected = Object.entries(selectedProducts).every(
+      ([day,productID]) => productID !== null
+    )
+    setPreview(allSelected)
+  }, [selectedProducts]);
 
   useEffect(()=>{
     fetchFoods()
   },[day])
 
-  return (
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        fetchUser();
+      }
+    });
+  
+    return () => unsubscribe(); // Cleanup listener
+  }, []);
+  
+  if(userData.submitted === 'true') {
+    return (
+      <div className="w-full h-full flex flex-col justify-center items-center">
+        <div>
+          <LucideBadgeCheck color="green" size={100}/>
+        </div>
+        <div className="mt-5">
+          <h1 className="text-xl font-semibold">Your order list for the week has been submitted</h1>
+          <h2 className="text-slate-600 text-md mt-1 text-center">You can order again next week</h2>
+        </div>
+      </div>
+    )
+  }else{
+    return (
     <div className="px-5">
  
       <section className="mt-10">
@@ -123,7 +151,7 @@ const Menu = () => {
         foods.length > 0 ?
           <div className="grid grid-cols-3 gap-2 mt-5 mobile:grid-cols-1 tablet:grid-cols-2 p-4">
             {foods.map((item,index)=>(
-              <div key={index} className="relative max-w-[300px] rounded-lg m-auto flex flex-col">
+              <div key={item.id} className="relative max-w-[300px] rounded-lg m-auto flex flex-col">
                 <div>
                   <img className="rounded-tl-lg rounded-tr-lg" src={Waakye} alt="product here"/>  
                 </div>
@@ -160,6 +188,7 @@ const Menu = () => {
       {openPreview && <ProductsPreview openPreview={openPreview} setOpenPreview={setOpenPreview} selectedProducts={selectedProducts}/>}
     </div>
   )
+  }
 }
 
 export default Menu

@@ -59,7 +59,7 @@ const Account = ({ openModal, setOpenModal }) => {
                 </div>
               </section>
     
-              <form className='w-[98%]' onSubmit={(e)=>e.preventDefault()}>
+              <section className='w-[98%]'>
                 <div>
                   <label>First Name</label>
                   <input type='text' 
@@ -108,7 +108,7 @@ const Account = ({ openModal, setOpenModal }) => {
                 >
                   Delete Account
                 </button>
-              </form>
+              </section>
             </motion.form>
         </motion.div>
       )}

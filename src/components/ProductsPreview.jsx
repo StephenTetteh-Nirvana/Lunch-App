@@ -1,12 +1,19 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import { onSnapshot, collection } from 'firebase/firestore'
-import { db } from '../firebase'
-import { useEffect, useState } from 'react'
+import { onSnapshot, collection, doc, getDoc, updateDoc } from 'firebase/firestore'
+import { Check } from 'lucide-react'
+import { auth, db } from '../firebase'
+import { useContext, useEffect, useState } from 'react'
+import GlobalState from '../context/GlobalState'
 
 const ProductsPreview = ({ openPreview, setOpenPreview, selectedProducts }) => {
+  const userData = localStorage.getItem('userData') !== null ? JSON.parse(localStorage.getItem('userData')) : []  
+  const {fetchUser} = useContext(GlobalState)
 
   const [isClosing,setIsClosing] = useState(false)
   const [loading,setLoading] = useState(false)
+  const [submitting,setSubmitting] = useState(false)
+  const [orderSubmitted,setOrderSubmitted] = useState(false)
+  const [changesDisabled,setChangesDisabled] = useState(false)
   const [matchedProducts,setMatchedProducts] = useState([])
 
   const closeModal = () => {
@@ -23,12 +30,12 @@ const ProductsPreview = ({ openPreview, setOpenPreview, selectedProducts }) => {
       setLoading(true);
       const unsub = onSnapshot(collection(db, "Foods"), (snapshot) => {
         const foodsArray = snapshot.docs.map((doc) => ({
-          ...doc.data().foods,
-        }));
+          ...doc.data().foods
+        }))
         processSelectedFoods(foodsArray)
         setLoading(false);
       })
-      return unsub; // Unsubscribe from the snapshot listener when needed
+      return unsub
     } catch (error) {
       console.log("Error fetching foods:", error);
       setLoading(false);
@@ -58,10 +65,58 @@ const ProductsPreview = ({ openPreview, setOpenPreview, selectedProducts }) => {
       }
     });
     setMatchedProducts(filteredProducts)
+  }
+ 
+  //Submit orders to HR
+  const submitOrders = async() => {
+    try{
+      const user = auth.currentUser
+      setSubmitting(true)
+      setChangesDisabled(true)
+      const docRef = doc(db,'Departments',userData.department)
+      const docData = await getDoc(docRef)
+      if(docData.exists()){
+        const personnelsArray = docData.data().personnels || []
+        const updatedPersonnelArray = personnelsArray.map((personnel)=>{
+          if(personnel.email === user.email){
+            return {
+            ...personnel,
+            orders:[...personnel.orders,matchedProducts]
+            }
+          }
+          return personnel
+        })
+                 
+        await updateDoc(docRef,{
+          personnels: updatedPersonnelArray
+        })
+      }
 
-    return filteredProducts
-  };
-  
+      //Set submitted value to true when order list is submitted
+      if(user){
+        const userDocRef = doc(db,'Users',user.uid)
+        const userData = await getDoc(userDocRef)
+        if(userData.exists()){
+          await updateDoc(userDocRef,{
+            submitted: 'true'
+          })
+        }
+        setOrderSubmitted(true)
+        await fetchUser()
+        setTimeout(()=>{
+          closeModal()
+        },1500)
+      }else{
+        console.log('user not detected')
+      }
+    }
+    catch(error){
+     console.log(error)
+    }finally{
+      setSubmitting(false)
+      setChangesDisabled(false)
+    }
+  }
 
   return (
     <AnimatePresence>
@@ -86,10 +141,10 @@ const ProductsPreview = ({ openPreview, setOpenPreview, selectedProducts }) => {
 
             {Object.entries(matchedProducts).map(([day, product]) => (
               <>
-                <div key={day} className='grid grid-cols-3 w-full gap-5 p-3'>
-                    <h3 className='font-semibold'>{day}</h3>
-                    <p>{product?.product}</p>
-                    <p>{product?.price}</p>
+                <div key={product.price} className='grid grid-cols-3 w-full gap-5 p-3'>
+                  <h3 className='font-semibold'>{day}</h3>
+                  <p>{product?.product}</p>
+                  <p>{product?.price}</p>
                 </div>
               </>
             ))}
@@ -99,15 +154,32 @@ const ProductsPreview = ({ openPreview, setOpenPreview, selectedProducts }) => {
             </h3>
 
             <div className="mt-2 flex justify-center">
-                <button className="bg-red-600 p-2 px-5 rounded-md text-white">
+              { submitting ?
+                <button className="bg-red-600 p-2 px-5 rounded-md text-white flex flex-row gap-3">
+                  <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <h3>Submitting...</h3>
+                </button>
+                :
+                orderSubmitted ? 
+                <button className=" mt-5 bg-green-700 p-2 flex flex-row justify-center items-center w-full text-md gap-2
+                  rounded-md text-white cursor-auto"
+                >
+                  <Check size={20} />
+                  Your order was submitted successfully.
+                </button>
+                :
+                <button className="bg-red-600 p-2 px-5 rounded-md text-white" onClick={()=>submitOrders()}>
                   Submit
                 </button>
-                <button
-                  className="bg-gray-500 p-2 px-5 rounded-md text-white ml-2"
-                  onClick={() => closeModal()}
-                >
-                  Make changes
-                </button>
+              }
+              <button
+                className={`bg-gray-500 p-2 px-5 rounded-md text-white ml-2 ${orderSubmitted && 'hidden'}`}
+                onClick={() => closeModal()}
+                disabled={changesDisabled}
+                style={changesDisabled ? {opacity:0.5,cursor:'not-allowed'}:{}}
+              >
+                Make changes
+              </button>
             </div>
           </motion.div>
         </motion.div>

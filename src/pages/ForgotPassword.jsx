@@ -9,6 +9,7 @@ const ForgotPassword = () => {
  
   const [email,setEmail] = useState('')
   const [loading,setLoading] = useState(false)
+  const navigate = useNavigate()
 
   const passwordReset = () => {
     setLoading(true)
@@ -32,7 +33,6 @@ const ForgotPassword = () => {
       });
   }
 
-  const navigate = useNavigate()
   return (
     <div className="flex justify-center items-center h-screen bg-gradient-to-l from-red-500  to-green-500">
       <div className="w-96 p-6 shadow-lg bg-white rounded-md">

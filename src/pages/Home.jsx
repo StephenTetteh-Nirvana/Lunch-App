@@ -5,10 +5,7 @@ import Carousel from "../components/Carousel"
 
 const Home = () => {
   const navigate = useNavigate()
-  const user = localStorage.getItem('user') !== null ? JSON.parse(localStorage.getItem('user')) : []
-
-  console.log(user)
-
+  const user = localStorage.getItem('user') !== null ? JSON.parse(localStorage.getItem('user')) : null
   
   return (
     <div className="bg-white w-full px-5">
@@ -53,7 +50,7 @@ const Home = () => {
               whileTap={{rotate: 360}}
               className="bg-red-500 px-6 py-3 group rounded-full mt-5 flex flex-row 
              text-white mobile:py-3"
-              onClick={()=>user ? navigate('/menu') : navigate('/login')}
+              onClick={()=>user !== null ? navigate('/menu') : navigate('/login')}
             >
               Place your weekly order
               <span className="ml-2 group-hover:ml-5 transition-margin duration-300 ease-in-out">

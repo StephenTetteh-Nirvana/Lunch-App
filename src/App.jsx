@@ -13,6 +13,7 @@ const App = () => {
   const navigate = useNavigate()
 
   const user = localStorage.getItem('user') !== null ? JSON.parse(localStorage.getItem('user')) : null
+
   const userStatus = () => {
     if(!user && location.pathname === '/menu'){
       navigate('/login')
@@ -21,7 +22,7 @@ const App = () => {
 
   useEffect(()=>{
     userStatus()
-  })
+  },[])
   
   return (
     <div>
